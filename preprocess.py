@@ -25,8 +25,21 @@ def split_at_last_word(string):
 org = pd.read_csv('./Evaluation-dataset.csv')
 org_clean = org.dropna(subset=['sentiment1'])
 org_clean = org_clean.dropna(how='all',axis=1)
+columns = ['sentence','garage service', 'ease of booking', 'value for money', 'location',
+       'length of fitting', 'change of date', 'tyre quality', 'wait time',
+       'delivery punctuality', 'mobile fitter', 'advisor/agent service',
+       'advisoragent service', 'extra charges', 'damage', 'balancing',
+       'facilities', 'change of time', 'booking confusion', 'late notice',
+       'discounts', 'refund not actioned', 'refund timescale',
+       "mobile fitter didn't arrive", 'discount not applied',
+       'tyre agedot code', 'failed payment', 'incorrect tyres sent',
+       'call wait time', 'refund', 'no stock', 'response time',
+       'tyre age/dot code']
 
-finaldf = pd.DataFrame(columns=['sentence','category','sentiment'])
+category_df = pd.DataFrame(columns=columns)
+category_df[columns[1:]] = 0
+
+sentiment_df = pd.DataFrame(columns=['sentence','category', 'sentiment'])
 
 # now i need to take each value in the columns, split it into seperate columns or add it to a new df
 # iterate through each column
@@ -36,6 +49,7 @@ columns_to_iterate = ['sentiment1', 'sentiment2', 'sentiment3', 'sentiment4',
        'sentiment14']
 
 for row in tqdm(org_clean.itertuples(index=True), total=len(org_clean)): # apply Poolexecutor
+    category_arr = []
     for col in columns_to_iterate:
         value = getattr(row, col)
 
@@ -47,16 +61,22 @@ for row in tqdm(org_clean.itertuples(index=True), total=len(org_clean)): # apply
         if sentiment not in ['positive', 'negative']:
             continue
 
-        # apply this to another dataframe
+        # depending on the category make that one and the others zeros
         if pd.notna(value):
             new_row_data = {'sentence': row.Sentence, 'category': category, 'sentiment': sentiment}
-            finaldf = finaldf._append(new_row_data, ignore_index=True)
-        # finaldf.append({'sentence':row['Sentence'], 'category':category, 'sentiment':sentiment}, ignore_index=True)
+            category_arr.append(category)
+            sentiment_df = sentiment_df._append(new_row_data, ignore_index=True)
+    
 
-print(finaldf)
-unique_values_per_column = {col: finaldf[col].unique() for col in finaldf.columns[1:]}
-no_unique_values_per_column = {col: len(finaldf[col].unique()) for col in finaldf.columns[1:]}
+    if len(category_arr) > 0:
+        # new_row = pd.Series(0, index=category_df.columns)
+        new_row = {col: 0 for col in columns}
+        new_row['sentence'] = row.Sentence
+        for category in category_arr:
+            new_row[category] = 1
+        
+        category_df = category_df._append(new_row, ignore_index=True)
+    
 
-print(unique_values_per_column)
-print(no_unique_values_per_column)
-finaldf.to_csv('final.csv')
+sentiment_df.to_csv('sentiment.csv')
+category_df.to_csv('category.csv')
