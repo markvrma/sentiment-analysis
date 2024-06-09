@@ -1,6 +1,6 @@
 # Approach
 
-*When reading the problem statement the easiest way was to use an OpenAI API and langchain and passing a prompt with a few examples.*
+*When reading the problem statement the easiest way was to use an OpenAI API key, incorporating langchain lib and passing a prompt with a few examples.*
 
 However this would not make use of the labelled dataset. **On further data exploration I saw that with the 8129 labelled rows, there were only 32 unique categories, which means this problem is two fold**
 
