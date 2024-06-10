@@ -1,4 +1,5 @@
 # Approach
+## [Solution](./training_nb.ipynb)
 
 *When reading the problem statement the easiest way was to use an OpenAI API key, incorporating langchain lib and passing a prompt with a few examples.*
 
